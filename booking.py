@@ -11,4 +11,4 @@ class Booking:
 
     def __str__(self):
         data_str = self.date_time.strftime("%d/%m/%Y %H:%M")
-        return f"{data_str} - {self.client.name} → {self.service.nome}"
+        return f"{data_str} - {self.client.name} → {self.service.name}"

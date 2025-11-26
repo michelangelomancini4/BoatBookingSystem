@@ -13,7 +13,7 @@ class AgendManager:
     def add_client(self,client):
         self.clients.append(client)
 
-    def show_client(self):
+    def show_clients(self):
         if not self.clients:
             print("Nessun cliente registrato.")
             return
