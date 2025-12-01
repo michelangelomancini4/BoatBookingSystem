@@ -1,8 +1,8 @@
 class Service:
-    def __init__(self, name , min_durate, price):
+    def __init__(self, name , duration, price):
         self.name=name
-        self.min_durate=min_durate
+        self.duration=duration
         self.price= price
     
     def __str__(self):
-        return f"{self.name} - {self.min_durate} min - {self.price} €"
+        return f"{self.name} - {self.duration} min - {self.price} €"
