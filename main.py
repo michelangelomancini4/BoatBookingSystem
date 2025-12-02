@@ -110,13 +110,19 @@ def print_menu():
     print("4) Show bookings")
     print("5) Add client")
     print("6) Add service")
+    print("7) Save data")
     print("0) Exit")
 
 
 def main():
     agend_manager = AgendManager()
-    seed_data(agend_manager)  # togli se non vuoi dati di test
 
+    # prova a caricare i dati da file
+    agend_manager.load_from_file()
+
+    # usa seed_data solo se non ci sono clienti (prima esecuzione)
+    if not agend_manager.clients:
+        seed_data(agend_manager)
     while True:
         print_menu()
         choice = input("Select an option: ").strip()
@@ -133,6 +139,9 @@ def main():
             create_client_interactive(agend_manager)
         elif choice == "6":
             create_service_interactive(agend_manager)
+        elif choice == "7":
+            agend_manager.save_to_file()
+
         elif choice == "0":
             print("Bye!")
             break

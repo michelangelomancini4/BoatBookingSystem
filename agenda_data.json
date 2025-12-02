@@ -1,0 +1,41 @@
+{
+  "clients": [
+    {
+      "client_id": 1,
+      "name": "Luca Verdi",
+      "telephone": "34912345678",
+      "email": null
+    },
+    {
+      "client_id": 2,
+      "name": "Giuseppe Nossi",
+      "telephone": null,
+      "email": "nossi@gin.it"
+    },
+    {
+      "client_id": 3,
+      "name": "fausto seniores",
+      "telephone": "3232322222",
+      "email": null
+    },
+    {
+      "client_id": 4,
+      "name": "clara mussi",
+      "telephone": "24599999",
+      "email": null
+    }
+  ],
+  "services": [
+    {
+      "name": "Giro grotte in barca",
+      "duration": 90,
+      "price": 40.0
+    },
+    {
+      "name": "Tramonto in barca",
+      "duration": 120,
+      "price": 60.0
+    }
+  ],
+  "bookings": []
+}

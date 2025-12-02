@@ -1,7 +1,12 @@
 from client import Client
 from service import Service
 from booking import Booking
+
 from datetime import datetime
+import json
+from pathlib import Path
+
+DATA_FILE = Path("agenda_data.json")
 
 class AgendManager:
     def __init__(self):
@@ -74,4 +79,93 @@ class AgendManager:
         # le ordiniamo per data/ora
         for booking in sorted(self.bookings, key=lambda b: b.date_time):
             print("-", booking)
-    
+
+    # ---------- PERSISTENCE (SAVE / LOAD) ----------
+
+    def to_dict(self):
+        """Convert current state to a serializable dict (for JSON)."""
+        return {
+            "clients": [
+                {
+                    "client_id": c.client_id,
+                    "name": c.name,
+                    "telephone": c.telephone,
+                    "email": c.email,
+                }
+                for c in self.clients
+            ],
+            "services": [
+                {
+                    "name": s.name,
+                    "duration": s.duration,
+                    "price": s.price,
+                }
+                for s in self.services
+            ],
+            "bookings": [
+                {
+                    "client_id": b.client.client_id,
+                    "service_name": b.service.name,
+                    "date_time": b.date_time.strftime("%Y-%m-%d %H:%M"),
+                }
+                for b in self.bookings
+            ],
+        }
+
+    def save_to_file(self, path: Path = DATA_FILE):
+        data = self.to_dict()
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        print(f"💾 Data saved to {path}")
+
+    def load_from_file(self, path: Path = DATA_FILE):
+        if not path.exists():
+            print("No data file found, starting with empty agenda.")
+            return
+
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # clear current lists
+        self.clients = []
+        self.services = []
+        self.bookings = []
+
+        # recreate clients
+        from client import Client
+        from service import Service
+
+        id_to_client = {}
+
+        for c in data.get("clients", []):
+            client = Client(
+                c["client_id"],
+                c["name"],
+                telephone=c.get("telephone"),
+                email=c.get("email"),
+            )
+            self.clients.append(client)
+            id_to_client[client.client_id] = client
+
+        name_to_service = {}
+
+        for s in data.get("services", []):
+            service = Service(
+                s["name"],
+                s["duration"],
+                s["price"],
+            )
+            self.services.append(service)
+            name_to_service[service.name] = service
+
+        for b in data.get("bookings", []):
+            client = id_to_client.get(b["client_id"])
+            service = name_to_service.get(b["service_name"])
+            if client is None or service is None:
+                continue  # skip invalid booking
+
+            date_time = datetime.strptime(b["date_time"], "%Y-%m-%d %H:%M")
+            booking = Booking(client, service, date_time)
+            self.bookings.append(booking)
+
+        print(f"✅ Data loaded from {path}")
