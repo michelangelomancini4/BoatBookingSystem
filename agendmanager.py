@@ -41,7 +41,24 @@ class AgendManager:
     ]
 
         self.clients.remove(client)
-        print(f"✅ Client deleted: {client}")        
+        print(f"✅ Client deleted: {client}")   
+
+    #----UPDATE-----
+    def update_client(self, client_id: int, name=None, telephone=None, email=None):
+        client = self.find_client_by_id(client_id)
+        if client is None:
+            print(f"❌ Client with id {client_id} not found.")
+            return
+
+        if name is not None:
+            client.name = name
+        if telephone is not None:
+            client.telephone = telephone
+        if email is not None:
+            client.email = email
+
+        print(f"✅ Client updated: {client}")
+  
 
     # --- SERVICES ---
 
@@ -72,6 +89,24 @@ class AgendManager:
 
         self.services.remove(service)
         print(f"✅ Service deleted: {service}")
+
+    #----UPDATE-----
+    def update_service(self, name: str, new_name=None, new_duration=None, new_price=None):
+        service = self.find_service_by_name(name)
+        if service is None:
+            print(f"❌ Service '{name}' not found.")
+            return
+
+        if new_name is not None:
+            service.name = new_name
+        if new_duration is not None:
+            service.duration = new_duration
+        if new_price is not None:
+            service.price = new_price
+
+        print(f"✅ Service updated: {service}")
+
+
 
 
       # --- HELPER METHODS ---
@@ -113,6 +148,31 @@ class AgendManager:
         print("Bookings:")
         for idx, booking in enumerate(self.bookings, start=1):
              print(f"{idx}) {booking}")
+
+    # ----UPDATE----
+    def update_booking(self, index: int, new_service_name=None, new_date_time=None):
+        if not self.bookings:
+            print("No bookings to update.")
+            return
+
+        if index < 1 or index > len(self.bookings):
+            print("❌ Invalid booking number.")
+            return
+
+        booking = self.bookings[index - 1]
+
+        if new_service_name is not None:
+            service = self.find_service_by_name(new_service_name)
+            if service is None:
+                print(f"❌ Service '{new_service_name}' not found.")
+                return
+            booking.service = service
+
+        if new_date_time is not None:
+            booking.date_time = new_date_time
+
+        print(f"✅ Booking updated: {booking}")
+
 
  
 

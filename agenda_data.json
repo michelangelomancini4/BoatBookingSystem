@@ -8,7 +8,7 @@
     },
     {
       "client_id": 2,
-      "name": "Giuseppe Nossi",
+      "name": "giuseppe de nossi",
       "telephone": null,
       "email": "nossi@gin.it"
     },
@@ -22,7 +22,7 @@
   "services": [
     {
       "name": "Giro grotte in barca",
-      "duration": 90,
+      "duration": 270,
       "price": 40.0
     },
     {
@@ -41,6 +41,11 @@
       "client_id": 3,
       "service_name": "uscita notturna in kayak",
       "date_time": "2025-03-03 03:03"
+    },
+    {
+      "client_id": 1,
+      "service_name": "Giro grotte in barca",
+      "date_time": "2025-04-04 04:04"
     }
   ]
 }

@@ -101,6 +101,131 @@ def create_booking_interactive(agend_manager: AgendManager):
 
     agend_manager.add_booking(client_id, service_name, date_time)
 
+# ---UPDATE SECTION----
+# CLIENT
+def update_client_interactive(agend_manager: AgendManager):
+    print("\n--- Update client ---")
+    agend_manager.show_clients()
+    if not agend_manager.clients:
+        return
+
+    client_id_input = input("Enter client id to update: ").strip()
+    if not client_id_input.isdigit():
+        print("❌ Invalid client id.")
+        return
+
+    client_id = int(client_id_input)
+    client = agend_manager.find_client_by_id(client_id)
+    if client is None:
+        print(f"❌ Client with id {client_id} not found.")
+        return
+
+    print(f"Current name: {client.name}")
+    new_name = input("New name (press Enter to keep): ").strip()
+    if new_name == "":
+        new_name = None
+
+    print(f"Current telephone: {client.telephone}")
+    new_tel = input("New telephone (press Enter to keep): ").strip()
+    if new_tel == "":
+        new_tel = None
+
+    print(f"Current email: {client.email}")
+    new_email = input("New email (press Enter to keep): ").strip()
+    if new_email == "":
+        new_email = None
+
+    agend_manager.update_client(client_id, name=new_name, telephone=new_tel, email=new_email)
+# SERVICE
+def update_service_interactive(agend_manager: AgendManager):
+    print("\n--- Update service ---")
+    agend_manager.show_services()
+    if not agend_manager.services:
+        return
+
+    name = input("Enter current service name to update: ").strip()
+    if not name:
+        print("❌ Service name cannot be empty.")
+        return
+
+    service = agend_manager.find_service_by_name(name)
+    if service is None:
+        print(f"❌ Service '{name}' not found.")
+        return
+
+    print(f"Current name: {service.name}")
+    new_name = input("New name (press Enter to keep): ").strip()
+    if new_name == "":
+        new_name = None
+
+    print(f"Current duration (minutes): {service.duration}")
+    duration_str = input("New duration (press Enter to keep): ").strip()
+    if duration_str == "":
+        new_duration = None
+    elif duration_str.isdigit():
+        new_duration = int(duration_str)
+    else:
+        print("❌ Duration must be a number or empty.")
+        return
+
+    print(f"Current price: {service.price}")
+    price_str = input("New price (press Enter to keep): ").strip()
+    if price_str == "":
+        new_price = None
+    else:
+        try:
+            new_price = float(price_str)
+        except ValueError:
+            print("❌ Price must be a number or empty.")
+            return
+
+    agend_manager.update_service(name, new_name=new_name, new_duration=new_duration, new_price=new_price)
+# BOOKING
+
+def update_booking_interactive(agend_manager: AgendManager):
+    print("\n--- Update booking ---")
+    agend_manager.show_bookings()
+    if not agend_manager.bookings:
+        return
+
+    index_input = input("Enter booking number to update: ").strip()
+    if not index_input.isdigit():
+        print("❌ Invalid booking number.")
+        return
+
+    index = int(index_input)
+    if index < 1 or index > len(agend_manager.bookings):
+        print("❌ Invalid booking number.")
+        return
+
+    booking = agend_manager.bookings[index - 1]
+    print(f"Current booking: {booking}")
+
+    # cambio servizio (opzionale)
+    change_service = input("Change service? (y/N): ").strip().lower()
+    new_service_name = None
+    if change_service == "y":
+        agend_manager.show_services()
+        new_service_name = input("Enter new service name (exact): ").strip()
+        if not new_service_name:
+            print("❌ Service name cannot be empty.")
+            return
+
+    # cambio data (opzionale)
+    from datetime import datetime
+    print(f"Current date/time: {booking.date_time.strftime('%Y-%m-%d %H:%M')}")
+    date_str = input("New date/time (YYYY-MM-DD HH:MM, Enter to keep): ").strip()
+    if date_str == "":
+        new_date_time = None
+    else:
+        try:
+            new_date_time = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("❌ Invalid date format.")
+            return
+
+    agend_manager.update_booking(index, new_service_name=new_service_name, new_date_time=new_date_time)
+
 # ---DELETE SECTION-----
 
 def delete_client_interactive(agend_manager: AgendManager):
@@ -159,6 +284,9 @@ def print_menu():
     print("8) Delete client")
     print("9) Delete service")
     print("10) Delete booking")
+    print("11) Update client")
+    print("12) Update service")
+    print("13) Update booking")
     print("0) Exit")
 
 
@@ -195,6 +323,12 @@ def main():
             delete_service_interactive(agend_manager)
         elif choice == "10":
             delete_booking_interactive(agend_manager)
+        elif choice == "11":
+            update_client_interactive(agend_manager)
+        elif choice == "12":
+            update_service_interactive(agend_manager)
+        elif choice == "13":
+            update_booking_interactive(agend_manager)
         elif choice == "0":
             print("Bye!")
             break
