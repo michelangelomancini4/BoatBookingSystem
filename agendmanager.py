@@ -27,6 +27,22 @@ class AgendManager:
         for client in self.clients:
             print("-", client)
 
+       # ----DELETE------
+    def delete_client(self, client_id: int):
+        client = self.find_client_by_id(client_id)
+        if client is None:
+            print(f"❌ Client with id {client_id} not found.")
+            return
+
+    # rimuovi tutte le booking legate a quel client
+        self.bookings = [
+            b for b in self.bookings
+            if b.client.client_id != client_id
+    ]
+
+        self.clients.remove(client)
+        print(f"✅ Client deleted: {client}")        
+
     # --- SERVICES ---
 
     def add_service(self , service):
@@ -39,6 +55,25 @@ class AgendManager:
         print("Servizi disponibili:")
         for service in self.services:
             print("-", service)
+    
+    # -----DELETE------
+
+    def delete_service(self, name: str):
+        service = self.find_service_by_name(name)
+        if service is None:
+         print(f"❌ Service '{name}' not found.")
+         return
+
+    # rimuovi tutte le booking che usano questo servizio
+        self.bookings = [
+            b for b in self.bookings
+            if b.service.name.lower() != service.name.lower()
+    ]
+
+        self.services.remove(service)
+        print(f"✅ Service deleted: {service}")
+
+
       # --- HELPER METHODS ---
 
     def find_client_by_id(self, client_id):
@@ -72,13 +107,14 @@ class AgendManager:
 
     def show_bookings(self):
         if not self.bookings:
-            print("Nessuna prenotazione.")
+            print("No bookings.")
             return
 
-        print("Prenotazioni:")
-        # le ordiniamo per data/ora
-        for booking in sorted(self.bookings, key=lambda b: b.date_time):
-            print("-", booking)
+        print("Bookings:")
+        for idx, booking in enumerate(self.bookings, start=1):
+             print(f"{idx}) {booking}")
+
+ 
 
     # ---------- PERSISTENCE (SAVE / LOAD) ----------
 

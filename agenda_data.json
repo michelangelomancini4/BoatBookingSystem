@@ -17,12 +17,6 @@
       "name": "fausto seniores",
       "telephone": "3232322222",
       "email": null
-    },
-    {
-      "client_id": 4,
-      "name": "clara mussi",
-      "telephone": "24599999",
-      "email": null
     }
   ],
   "services": [
@@ -35,7 +29,18 @@
       "name": "Tramonto in barca",
       "duration": 120,
       "price": 60.0
+    },
+    {
+      "name": "uscita notturna in kayak",
+      "duration": 120,
+      "price": 35.0
     }
   ],
-  "bookings": []
+  "bookings": [
+    {
+      "client_id": 3,
+      "service_name": "uscita notturna in kayak",
+      "date_time": "2025-03-03 03:03"
+    }
+  ]
 }

@@ -101,6 +101,51 @@ def create_booking_interactive(agend_manager: AgendManager):
 
     agend_manager.add_booking(client_id, service_name, date_time)
 
+# ---DELETE SECTION-----
+
+def delete_client_interactive(agend_manager: AgendManager):
+    print("\n--- Delete client ---")
+    agend_manager.show_clients()
+    if not agend_manager.clients:
+        return
+
+    client_id_input = input("Enter client id to delete: ").strip()
+    if not client_id_input.isdigit():
+        print("❌ Invalid client id.")
+        return
+
+    client_id = int(client_id_input)
+    agend_manager.delete_client(client_id)
+
+def delete_service_interactive(agend_manager: AgendManager):
+    print("\n--- Delete service ---")
+    agend_manager.show_services()
+    if not agend_manager.services:
+        return
+
+    name = input("Enter service name to delete (exact): ").strip()
+    if not name:
+        print("❌ Service name cannot be empty.")
+        return
+
+    agend_manager.delete_service(name)
+
+def delete_booking_interactive(agend_manager: AgendManager):
+    print("\n--- Delete booking ---")
+    agend_manager.show_bookings()
+    if not agend_manager.bookings:
+        return
+
+    index_input = input("Enter booking number to delete: ").strip()
+    if not index_input.isdigit():
+        print("❌ Invalid booking number.")
+        return
+
+    index = int(index_input)
+    agend_manager.delete_booking(index)
+
+
+
 
 def print_menu():
     print("\n===== Agenda Manager =====")
@@ -111,6 +156,9 @@ def print_menu():
     print("5) Add client")
     print("6) Add service")
     print("7) Save data")
+    print("8) Delete client")
+    print("9) Delete service")
+    print("10) Delete booking")
     print("0) Exit")
 
 
@@ -141,7 +189,12 @@ def main():
             create_service_interactive(agend_manager)
         elif choice == "7":
             agend_manager.save_to_file()
-
+        elif choice == "8":
+            delete_client_interactive(agend_manager)
+        elif choice == "9":
+            delete_service_interactive(agend_manager)
+        elif choice == "10":
+            delete_booking_interactive(agend_manager)
         elif choice == "0":
             print("Bye!")
             break
