@@ -146,8 +146,26 @@ class AgendManager:
             return
 
         print("Bookings:")
+        self.bookings.sort(key=lambda b: b.date_time)
         for idx, booking in enumerate(self.bookings, start=1):
              print(f"{idx}) {booking}")
+    
+    def show_bookings_by_client(self, client_id: int):
+        results = [
+            b for b in self.bookings 
+            if b.client.client_id == client_id
+        ]
+
+        if not results:
+            print(f"❌ No bookings found for client ID {client_id}.")
+            return
+
+        results.sort(key=lambda b: b.date_time)
+
+        print(f"\n📅 Bookings for client {client_id}:")
+        for idx, booking in enumerate(results, start=1):
+            print(f"{idx}) {booking}")
+
 
     # ----UPDATE----
     def update_booking(self, index: int, new_service_name=None, new_date_time=None):

@@ -287,6 +287,8 @@ def print_menu():
     print("11) Update client")
     print("12) Update service")
     print("13) Update booking")
+    print("14) Show bookings by client")
+
     print("0) Exit")
 
 
@@ -329,6 +331,10 @@ def main():
             update_service_interactive(agend_manager)
         elif choice == "13":
             update_booking_interactive(agend_manager)
+        elif choice == "14":
+            client_id_input = input("Enter client ID: ").strip()
+            if client_id_input.isdigit():
+                agend_manager.show_bookings_by_client(int(client_id_input))
         elif choice == "0":
             print("Bye!")
             break
