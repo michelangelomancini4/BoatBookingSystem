@@ -2,6 +2,15 @@ from agendmanager import AgendManager
 from client import Client
 from service import Service
 from datetime import datetime
+from exceptions import (
+    ClientNotFoundError,
+    ServiceNotFoundError,
+    BookingNotFoundError,
+    InvalidDateError,
+    InvalidServiceDataError,
+    InvalidClientDataError,
+)
+
 
 
 def seed_data(agend_manager: AgendManager):
@@ -270,7 +279,7 @@ def delete_booking_interactive(agend_manager: AgendManager):
     agend_manager.delete_booking(index)
 
 
-
+# ---MENU---
 
 def print_menu():
     print("\n===== Agenda Manager =====")
@@ -291,55 +300,68 @@ def print_menu():
 
     print("0) Exit")
 
-
 def main():
     agend_manager = AgendManager()
 
-    # prova a caricare i dati da file
     agend_manager.load_from_file()
 
-    # usa seed_data solo se non ci sono clienti (prima esecuzione)
     if not agend_manager.clients:
         seed_data(agend_manager)
+
     while True:
         print_menu()
         choice = input("Select an option: ").strip()
 
-        if choice == "1":
-            agend_manager.show_clients()
-        elif choice == "2":
-            agend_manager.show_services()
-        elif choice == "3":
-            create_booking_interactive(agend_manager)
-        elif choice == "4":
-            agend_manager.show_bookings()
-        elif choice == "5":
-            create_client_interactive(agend_manager)
-        elif choice == "6":
-            create_service_interactive(agend_manager)
-        elif choice == "7":
-            agend_manager.save_to_file()
-        elif choice == "8":
-            delete_client_interactive(agend_manager)
-        elif choice == "9":
-            delete_service_interactive(agend_manager)
-        elif choice == "10":
-            delete_booking_interactive(agend_manager)
-        elif choice == "11":
-            update_client_interactive(agend_manager)
-        elif choice == "12":
-            update_service_interactive(agend_manager)
-        elif choice == "13":
-            update_booking_interactive(agend_manager)
-        elif choice == "14":
-            client_id_input = input("Enter client ID: ").strip()
-            if client_id_input.isdigit():
-                agend_manager.show_bookings_by_client(int(client_id_input))
-        elif choice == "0":
-            print("Bye!")
-            break
-        else:
-            print("❌ Invalid option, please try again.")
+        try:
+            if choice == "1":
+                agend_manager.show_clients()
+            elif choice == "2":
+                agend_manager.show_services()
+            elif choice == "3":
+                create_booking_interactive(agend_manager)
+            elif choice == "4":
+                agend_manager.show_bookings()
+            elif choice == "5":
+                create_client_interactive(agend_manager)
+            elif choice == "6":
+                create_service_interactive(agend_manager)
+            elif choice == "7":
+                agend_manager.save_to_file()
+            elif choice == "8":
+                delete_client_interactive(agend_manager)
+            elif choice == "9":
+                delete_service_interactive(agend_manager)
+            elif choice == "10":
+                delete_booking_interactive(agend_manager)
+            elif choice == "11":
+                update_client_interactive(agend_manager)
+            elif choice == "12":
+                update_service_interactive(agend_manager)
+            elif choice == "13":
+                update_booking_interactive(agend_manager)
+            elif choice == "14":
+                client_id_input = input("Enter client ID: ").strip()
+                if client_id_input.isdigit():
+                    agend_manager.show_bookings_by_client(int(client_id_input))
+                else:
+                    print("❌ Invalid client id.")
+            elif choice == "0":
+                print("Bye!")
+                break
+            else:
+                print("❌ Invalid option, please try again.")
+
+        except ClientNotFoundError as e:
+            print(f"❌ Client error: {e}")
+        except ServiceNotFoundError as e:
+            print(f"❌ Service error: {e}")
+        except BookingNotFoundError as e:
+            print(f"❌ Booking error: {e}")
+        except InvalidDateError as e:
+            print(f"❌ Date error: {e}")
+        except (InvalidClientDataError, InvalidServiceDataError) as e:
+            print(f"❌ Data validation error: {e}")
+
 
 
 if __name__ == "__main__":

@@ -1,7 +1,15 @@
 from client import Client
 from service import Service
 from booking import Booking
-
+from exceptions import (
+    ClientNotFoundError,
+    ServiceNotFoundError,
+    BookingNotFoundError,
+    InvalidDateError,
+    InvalidServiceDataError,
+    InvalidClientDataError,
+)
+ 
 from datetime import datetime
 import json
 from pathlib import Path
@@ -31,8 +39,7 @@ class AgendManager:
     def delete_client(self, client_id: int):
         client = self.find_client_by_id(client_id)
         if client is None:
-            print(f"❌ Client with id {client_id} not found.")
-            return
+            raise ClientNotFoundError(f"Client with id {client_id} not found.")
 
     # rimuovi tutte le booking legate a quel client
         self.bookings = [
@@ -47,8 +54,8 @@ class AgendManager:
     def update_client(self, client_id: int, name=None, telephone=None, email=None):
         client = self.find_client_by_id(client_id)
         if client is None:
-            print(f"❌ Client with id {client_id} not found.")
-            return
+            raise ClientNotFoundError(f"❌ Client with id {client_id} not found.")
+            
 
         if name is not None:
             client.name = name
@@ -73,13 +80,12 @@ class AgendManager:
         for service in self.services:
             print("-", service)
     
-    # -----DELETE------
+    # -----SERVICE DELETE------
 
     def delete_service(self, name: str):
         service = self.find_service_by_name(name)
         if service is None:
-         print(f"❌ Service '{name}' not found.")
-         return
+            raise ServiceNotFoundError(f"Service {name} not found.")      
 
     # rimuovi tutte le booking che usano questo servizio
         self.bookings = [
@@ -94,8 +100,8 @@ class AgendManager:
     def update_service(self, name: str, new_name=None, new_duration=None, new_price=None):
         service = self.find_service_by_name(name)
         if service is None:
-            print(f"❌ Service '{name}' not found.")
-            return
+            raise ServiceNotFoundError(f"Service {name} not found.")      
+  
 
         if new_name is not None:
             service.name = new_name
@@ -129,12 +135,11 @@ class AgendManager:
         service = self.find_service_by_name(service_name)
 
         if client is None:
-            print(f" Client with id {client_id} not found.")
-            return
+            raise ClientNotFoundError(f"Client with id {client_id} not found.")
+
 
         if service is None:
-            print(f" Service '{service_name}' not found.")
-            return
+            raise ServiceNotFoundError(f" Service '{service_name}' not found.")
 
         booking = Booking(client, service, date_time)
         self.bookings.append(booking)
@@ -170,22 +175,19 @@ class AgendManager:
     # ----UPDATE----
     def update_booking(self, index: int, new_service_name=None, new_date_time=None):
         if not self.bookings:
-            print("No bookings to update.")
-            return
+            raise BookingNotFoundError("No bookings to update.")
 
         if index < 1 or index > len(self.bookings):
-            print("❌ Invalid booking number.")
-            return
+            raise BookingNotFoundError(f"Error : index out of range")
 
         booking = self.bookings[index - 1]
 
         if new_service_name is not None:
             service = self.find_service_by_name(new_service_name)
             if service is None:
-                print(f"❌ Service '{new_service_name}' not found.")
-                return
+                raise ServiceNotFoundError(f"❌ Service '{new_service_name}' not found.")
+                
             booking.service = service
-
         if new_date_time is not None:
             booking.date_time = new_date_time
 
