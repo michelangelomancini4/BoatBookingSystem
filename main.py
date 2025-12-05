@@ -1,7 +1,6 @@
 from agendmanager import AgendManager
 from client import Client
 from service import Service
-from datetime import datetime
 from exceptions import (
     ClientNotFoundError,
     ServiceNotFoundError,
@@ -10,6 +9,7 @@ from exceptions import (
     InvalidServiceDataError,
     InvalidClientDataError,
 )
+from validators import parse_datetime, parse_int, parse_float,validate_contact
 
 
 
@@ -41,8 +41,7 @@ def create_client_interactive(agend_manager: AgendManager):
     telephone = input("Enter telephone (optional): ").strip()
     email = input("Enter email (optional): ").strip()
 
-    if not telephone and not email:
-        print("❌ At least one contact (telephone or email) is required.")
+    if not validate_contact(telephone, email):
         return
 
     # genera nuovo id: max esistente + 1
@@ -62,16 +61,13 @@ def create_service_interactive(agend_manager: AgendManager):
         return
 
     duration_str = input("Enter duration in minutes: ").strip()
-    if not duration_str.isdigit():
-        print("❌ Duration must be a number of minutes.")
+    duration= parse_int(duration_str)
+    if duration is None:
         return
-    duration = int(duration_str)
 
     price_str = input("Enter price (e.g. 40 or 40.0): ").strip()
-    try:
-        price = float(price_str)
-    except ValueError:
-        print("❌ Price must be a number.")
+    price = parse_float(price_str)
+    if price is None:
         return
 
     service = Service(name, duration, price)
@@ -89,10 +85,9 @@ def create_booking_interactive(agend_manager: AgendManager):
 
     # scegli client
     client_id_input = input("Enter client id: ").strip()
-    if not client_id_input.isdigit():
-        print("❌ Invalid client id.")
+    client_id = parse_int(client_id_input)
+    if client_id is None:
         return
-    client_id = int(client_id_input)
 
     # scegli service
     service_name = input("Enter service name (exact): ").strip()
@@ -102,11 +97,10 @@ def create_booking_interactive(agend_manager: AgendManager):
 
     # scegli data/ora
     date_str = input("Enter date and time (YYYY-MM-DD HH:MM): ").strip()
-    try:
-        date_time = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
-    except ValueError:
-        print("❌ Invalid date format. Use YYYY-MM-DD HH:MM.")
+    date_time= parse_datetime(date_str)
+    if date_time is None:
         return
+    
 
     agend_manager.add_booking(client_id, service_name, date_time)
 
@@ -119,11 +113,10 @@ def update_client_interactive(agend_manager: AgendManager):
         return
 
     client_id_input = input("Enter client id to update: ").strip()
-    if not client_id_input.isdigit():
-        print("❌ Invalid client id.")
+    client_id = parse_int(client_id_input)
+    if client_id is None:
         return
 
-    client_id = int(client_id_input)
     client = agend_manager.find_client_by_id(client_id)
     if client is None:
         print(f"❌ Client with id {client_id} not found.")
@@ -143,6 +136,12 @@ def update_client_interactive(agend_manager: AgendManager):
     new_email = input("New email (press Enter to keep): ").strip()
     if new_email == "":
         new_email = None
+
+    final_telephone = new_tel if new_tel is not None else client.telephone
+    final_email = new_email if new_email is not None else client.email
+
+    if not validate_contact(final_telephone or "", final_email or ""):
+        return
 
     agend_manager.update_client(client_id, name=new_name, telephone=new_tel, email=new_email)
 # SERVICE
@@ -170,25 +169,27 @@ def update_service_interactive(agend_manager: AgendManager):
     print(f"Current duration (minutes): {service.duration}")
     duration_str = input("New duration (press Enter to keep): ").strip()
     if duration_str == "":
-        new_duration = None
-    elif duration_str.isdigit():
-        new_duration = int(duration_str)
+        new_duration = None   
     else:
-        print("❌ Duration must be a number or empty.")
-        return
+        new_duration = parse_int(duration_str)
+        if new_duration is None:
+            return            
 
     print(f"Current price: {service.price}")
     price_str = input("New price (press Enter to keep): ").strip()
     if price_str == "":
-        new_price = None
+        new_price = None     
     else:
-        try:
-            new_price = float(price_str)
-        except ValueError:
-            print("❌ Price must be a number or empty.")
-            return
+        new_price = parse_float(price_str)
+        if new_price is None:
+            return            
 
-    agend_manager.update_service(name, new_name=new_name, new_duration=new_duration, new_price=new_price)
+    agend_manager.update_service(
+        name,
+        new_name=new_name,
+        new_duration=new_duration,
+        new_price=new_price,
+    )
 # BOOKING
 
 def update_booking_interactive(agend_manager: AgendManager):
@@ -198,11 +199,10 @@ def update_booking_interactive(agend_manager: AgendManager):
         return
 
     index_input = input("Enter booking number to update: ").strip()
-    if not index_input.isdigit():
-        print("❌ Invalid booking number.")
+    index = parse_int(index_input)
+    if index is None:
         return
 
-    index = int(index_input)
     if index < 1 or index > len(agend_manager.bookings):
         print("❌ Invalid booking number.")
         return
@@ -221,16 +221,13 @@ def update_booking_interactive(agend_manager: AgendManager):
             return
 
     # cambio data (opzionale)
-    from datetime import datetime
     print(f"Current date/time: {booking.date_time.strftime('%Y-%m-%d %H:%M')}")
     date_str = input("New date/time (YYYY-MM-DD HH:MM, Enter to keep): ").strip()
     if date_str == "":
         new_date_time = None
     else:
-        try:
-            new_date_time = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
-        except ValueError:
-            print("❌ Invalid date format.")
+        new_date_time=parse_datetime(date_str)
+        if new_date_time is None:
             return
 
     agend_manager.update_booking(index, new_service_name=new_service_name, new_date_time=new_date_time)
@@ -244,11 +241,9 @@ def delete_client_interactive(agend_manager: AgendManager):
         return
 
     client_id_input = input("Enter client id to delete: ").strip()
-    if not client_id_input.isdigit():
-        print("❌ Invalid client id.")
+    client_id = parse_int(client_id_input)
+    if client_id is None:
         return
-
-    client_id = int(client_id_input)
     agend_manager.delete_client(client_id)
 
 def delete_service_interactive(agend_manager: AgendManager):
@@ -271,11 +266,9 @@ def delete_booking_interactive(agend_manager: AgendManager):
         return
 
     index_input = input("Enter booking number to delete: ").strip()
-    if not index_input.isdigit():
-        print("❌ Invalid booking number.")
+    index = parse_int(index_input)
+    if index is None:
         return
-
-    index = int(index_input)
     agend_manager.delete_booking(index)
 
 
@@ -341,10 +334,13 @@ def main():
                 update_booking_interactive(agend_manager)
             elif choice == "14":
                 client_id_input = input("Enter client ID: ").strip()
-                if client_id_input.isdigit():
-                    agend_manager.show_bookings_by_client(int(client_id_input))
-                else:
+                client_id = parse_int(client_id_input)
+                if client_id is None:
+                    # input sbagliato → mostriamo errore ma NON usciamo dal programma
                     print("❌ Invalid client id.")
+                else:
+                    agend_manager.show_bookings_by_client(client_id)
+
             elif choice == "0":
                 print("Bye!")
                 break
